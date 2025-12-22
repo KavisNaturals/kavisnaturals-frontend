@@ -42,3 +42,4 @@ Thumbs.db
 
 # Optional: ignore frontend/node_modules if nested
 frontend/node_modules/
+.vercel
