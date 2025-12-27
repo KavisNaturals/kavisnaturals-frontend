@@ -73,6 +73,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading) !important;
 }
 
+/* Utility to force the site sans font when !important is required */
+.force-sans {
+  font-family: var(--font-sans) !important;
+}
+
 /* Mobile responsive font sizes */
 @media (max-width: 768px) {
   .section-title {

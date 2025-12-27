@@ -12,22 +12,22 @@ const HeroBanner = () => {
   const bannerImages = [
     {
       id: 1,
-      src: '/images/banner.png',
+      src: '/images/banner-2.png',
       alt: 'Natural Organic Products Banner 1'
     },
     {
       id: 2,
-      src: '/images/banner-2.png',
+      src: '/images/banner-3.png',
       alt: 'Natural Organic Products Banner 2'
     },
     {
       id: 3,
-      src: '/images/banner-3.png',
+      src: '/images/banner-2.png',
       alt: 'Natural Organic Products Banner 3'
     },
     {
       id: 4,
-      src: '/images/banner.png',
+      src: '/images/banner-3.png',
       alt: 'Natural Organic Products Banner 4'
     },
     {

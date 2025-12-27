@@ -121,7 +121,7 @@ const BestSellers = () => {
               </div>
 
               {/* Hover Action Buttons */}
-              <div className="absolute bottom-[20rem] left-4 right-4 flex justify-center space-x-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+              <div className="absolute bottom-[15rem] left-4 right-4 flex justify-center space-x-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
                 <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-primary hover:text-white transition-colors">
                   <ShoppingCart size={18} />
                 </button>
@@ -134,7 +134,7 @@ const BestSellers = () => {
               </div>
 
               {/* Product Info */}
-              <div className="p-6 text-center">
+              <div className="pb-3 text-center">
                 {/* Rating */}
                 <div className="flex items-center justify-center space-x-2 mb-3">
                   {renderStars(product.rating)}
