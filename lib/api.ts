@@ -340,7 +340,7 @@ export interface AdminUser {
 
 export const usersApi = {
   getProfile: () => api.get<UserProfile>('/api/users/profile'),
-  updateProfile: (data: Partial<UserProfile & { password?: string }>) =>
+  updateProfile: (data: Partial<UserProfile & { password?: string; currentPassword?: string }>) =>
     api.put<UserProfile>('/api/users/profile', data),
   getAddresses: () => api.get<Address[]>('/api/users/address'),
   saveAddress: (data: Partial<Address>) => api.post<Address>('/api/users/address', data),

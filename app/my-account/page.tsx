@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ const STATUS_COLORS: Record<string, string> = {
   returned: 'bg-gray-100 text-gray-800',
 }
 
-const MyAccountPage = () => {
+const MyAccountContent = () => {
   const { isLoggedIn, logout, authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -143,7 +143,7 @@ const MyAccountPage = () => {
                   ) : (
                     <div className="space-y-4">
                       {orders.map((order) => {
-                        const items = order.OrderItems || order.items || []
+                        const items = order.OrderItems || []
                         const status = order.delivery_status || (order as any).status || 'pending'
                         return (
                           <div key={order.id} className="border border-gray-200 rounded-xl p-5">
@@ -189,5 +189,11 @@ const MyAccountPage = () => {
     </main>
   )
 }
+
+const MyAccountPage = () => (
+  <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <MyAccountContent />
+  </Suspense>
+)
 
 export default MyAccountPage

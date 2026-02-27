@@ -59,7 +59,7 @@ export default function ProductDetailPage() {
       setProduct(prod);
       setMainImage(getImage(prod));
       setReviews(Array.isArray(revs) ? revs : []);
-      setRelatedProducts((Array.isArray(related) ? related : related?.products || []).filter((p: Product) => String(p.id) !== productId).slice(0, 6));
+      setRelatedProducts((Array.isArray(related) ? related : []).filter((p: Product) => String(p.id) !== productId).slice(0, 6));
     }).catch(() => {}).finally(() => setLoading(false));
   }, [productId]);
 
@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
     </div>
   );
 
-  const avgRating = reviews.length ? reviews.reduce((a, r) => a + Number(r.rating || 0), 0) / reviews.length : Number(product?.average_rating || 0);
+  const avgRating = reviews.length ? reviews.reduce((a, r) => a + Number(r.rating || 0), 0) / reviews.length : Number((product as any)?.average_rating || 0);
   const ratingDist = [5,4,3,2,1].map(s => ({ stars: s, percentage: reviews.length ? Math.round(reviews.filter(r => Math.floor(Number(r.rating)) === s).length / reviews.length * 100) : (s === 5 ? 80 : s === 4 ? 12 : s === 3 ? 5 : s === 2 ? 2 : 1) }));
 
   if (loading) return (
@@ -268,8 +268,8 @@ export default function ProductDetailPage() {
                 >
                   Checkout Now
                 </button>
-                <button onClick={() => toggleWishlist(Number(productId))} className={`w-full py-3 border-2 rounded-lg font-semibold transition-colors ${isInWishlist(Number(productId)) ? 'border-red-400 text-red-500 bg-red-50' : 'border-gray-300 text-gray-700 hover:border-primary'}`}>
-                  {isInWishlist(Number(productId)) ? '♥ Remove from Wishlist' : '♡ Add to Wishlist'}
+                <button onClick={() => toggleWishlist(productId)} className={`w-full py-3 border-2 rounded-lg font-semibold transition-colors ${isInWishlist(productId) ? 'border-red-400 text-red-500 bg-red-50' : 'border-gray-300 text-gray-700 hover:border-primary'}`}>
+                  {isInWishlist(productId) ? '♥ Remove from Wishlist' : '♡ Add to Wishlist'}
                 </button>
               </div>
             </div>

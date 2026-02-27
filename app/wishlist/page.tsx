@@ -55,14 +55,14 @@ const WishlistPage = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map(item => {
-                const product = item.Product || item
+                const product = (item.Product || item) as any
                 const pid = item.product_id || item.id
                 return (
                   <div key={item.id} className="bg-white border-2 border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group relative">
                     <div className="relative aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
                       <Image src={getImage(product)} alt={product.name || 'Product'} width={500} height={500} className="object-contain p-6" />
                       <div className="absolute flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity" style={{ bottom: '4rem', left: '50%', transform: 'translateX(-50%)' }}>
-                        <button onClick={() => addItem({ id: pid, name: product.name, price: Number(product.price || product.sale_price || 0), image: getImage(product) })}
+                        <button onClick={() => addItem({ id: pid, name: product.name, price: Number(product.price || product.sale_price || 0), imageUrl: getImage(product) })}
                           className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-primary transition-colors">
                           <ShoppingCart size={18} strokeWidth={2} />
                         </button>

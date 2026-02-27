@@ -23,7 +23,7 @@ const AdminOrdersPage = () => {
     if (!isLoggedIn || !isAdmin) { router.push('/admin/login'); return }
     ordersApi.getAllAdmin()
       .then(data => {
-        const allOrders = Array.isArray(data) ? data : data?.orders || []
+        const allOrders = Array.isArray(data) ? data : []
         const filtered = statusFilter
           ? allOrders.filter((order: any) => (order.delivery_status || order.status || '').toLowerCase() === statusFilter)
           : allOrders

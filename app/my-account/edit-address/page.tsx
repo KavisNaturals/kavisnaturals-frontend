@@ -53,7 +53,7 @@ function EditAddressForm() {
     setSaving(true); setError('')
     try {
       if (isNew) await usersApi.saveAddress(formData)
-      else await usersApi.updateAddress(Number(addressId), formData)
+      else await usersApi.updateAddress(String(addressId), formData)
       router.push('/my-account')
     } catch {
       setError('Failed to save address. Please try again.')

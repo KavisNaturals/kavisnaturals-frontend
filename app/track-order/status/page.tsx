@@ -32,7 +32,7 @@ const TrackOrderStatusPage = () => {
     else { router.replace('/track-order') }
   }, [router])
 
-  const currentStep = order ? stepIndex(order.delivery_status || order.status || 'pending') : 0
+  const currentStep = order ? stepIndex(order.delivery_status || (order as any).status || 'pending') : 0
 
   return (
     <main className="min-h-screen bg-white">
@@ -61,7 +61,7 @@ const TrackOrderStatusPage = () => {
           <div className="max-w-3xl mx-auto px-4">
             <div className="flex flex-wrap gap-6 text-sm text-gray-700">
               <span><span className="font-semibold">Order ID:</span> #{order.id}</span>
-              <span><span className="font-semibold">Status:</span> <span className="capitalize">{(order.delivery_status || order.status || '').replace(/_/g, ' ')}</span></span>
+              <span><span className="font-semibold">Status:</span> <span className="capitalize">{(order.delivery_status || (order as any).status || '').replace(/_/g, ' ')}</span></span>
               {order.total_amount && <span><span className="font-semibold">Total:</span> ₹{Number(order.total_amount).toFixed(2)}</span>}
             </div>
           </div>
