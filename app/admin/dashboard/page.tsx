@@ -119,9 +119,12 @@ const AdminDashboard = () => {
                       allowDecimals={false}
                     />
                     <Tooltip
-                      formatter={(value: any, name: string) =>
-                        name === 'revenue' ? [`₹${Number(value).toLocaleString()}`, 'Revenue'] : [value, 'Orders']
-                      }
+                      formatter={(value: any, name?: string): [string, string] | [any, string] => {
+                        const key = name || ''
+                        return key === 'revenue'
+                          ? [`₹${Number(value).toLocaleString()}`, 'Revenue']
+                          : [value, 'Orders']
+                      }}
                       contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}
                     />
                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
