@@ -1,7 +1,7 @@
 import { getToken, getRefreshToken, saveAuth, clearAuth } from './auth';
 
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  process.env.NEXT_PUBLIC_API_URL || 'https://api.kavisnaturals.cloud';
 
 /** Return auth header object if token exists. */
 export function authHeader(): Record<string, string> {
