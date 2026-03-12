@@ -136,9 +136,11 @@ export interface Product {
   benefits?: string[];
   ingredients?: string[];
   direction?: string;
-  options?: { label: string; price: number; stock?: number; image?: string }[];
+  options?: { label: string; price: number; stock?: number; image?: string; unit_price_label?: string }[];
   stock: number;
   is_featured: boolean;
+  tagline?: string;
+  frequently_bought_together?: string[];
   sku?: string;
 }
 
@@ -248,6 +250,7 @@ export interface Review {
   rating: number;
   comment: string;
   user_name: string;
+  place?: string;
   createdAt: string;
   Product?: { name: string; image_path?: string };
 }
@@ -255,7 +258,7 @@ export interface Review {
 export const reviewsApi = {
   getForProduct: (productId: string) =>
     api.get<Review[]>(`/api/products/${productId}/reviews`),
-  addReview: (productId: string, data: { rating: number; comment: string; user_name: string }) =>
+  addReview: (productId: string, data: { rating: number; comment: string; user_name: string; place?: string }) =>
     api.post<Review>(`/api/products/${productId}/reviews`, data),
   getFeatured: (limit?: number) =>
     api.get<Review[]>(`/api/reviews/featured${limit ? `?limit=${limit}` : ''}`),

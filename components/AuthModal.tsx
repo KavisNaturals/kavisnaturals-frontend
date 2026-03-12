@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { X, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { API_BASE_URL } from '@/lib/api'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -45,7 +46,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
         await register(formData.name, formData.email, formData.password, formData.phone)
         onClose()
       } else if (mode === 'forgot') {
-        // Placeholder – no backend forgot-password endpoint yet
+        const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || 'Failed to send reset link')
         setForgotSent(true)
       }
     } catch (err: unknown) {

@@ -2,7 +2,7 @@
 const nextConfig = {
   images: {
     unoptimized: true,
-    domains: ['localhost'],
+    domains: ['localhost', 'api.kavisnaturals.cloud'],
   },
 }
 

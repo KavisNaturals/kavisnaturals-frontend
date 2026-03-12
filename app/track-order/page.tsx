@@ -52,7 +52,7 @@ const TrackOrderPage = () => {
       {/* Track Order Form */}
       <section className="py-12">
         <div className="max-w-3xl mx-auto px-4">
-          <p className="text-center text-gray-700 mb-8">
+          <p className="text-center text-gray-800 mb-8 max-w-xl mx-auto">
             To track your order please enter your Order ID in the box below and press the &quot;Track&quot; button. This was given to you on your receipt and in the confirmation email you should have received.
           </p>
 

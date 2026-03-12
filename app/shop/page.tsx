@@ -23,10 +23,15 @@ function getProductImage(product: Product) {
 
 function ShopContent() {
   const searchParams = useSearchParams()
-  const initialCategory = searchParams.get('category') || 'All Products'
 
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory)
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get('category') || 'All Products')
   const [sortBy, setSortBy] = useState('featured')
+
+  // Sync when URL params change (e.g. navigating here from the header dropdown)
+  useEffect(() => {
+    const cat = searchParams.get('category') || 'All Products'
+    setSelectedCategory(cat)
+  }, [searchParams])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -138,8 +143,8 @@ function ShopContent() {
                       </div>
                     )}
                     {!isOOS && (
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/10">
-                        <div className="flex space-x-2">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/10 pointer-events-none">
+                        <div className="flex space-x-2 pointer-events-auto">
                           <button
                             onClick={() => {
                               if (hasVariants) {
@@ -172,17 +177,24 @@ function ShopContent() {
                       {renderStars(product.rating)}
                       <span className="text-xs text-gray-600">({product.reviews_count})</span>
                     </div>
-                    <h3 className="font-semibold text-gray-800 mb-2 text-sm line-clamp-2">{product.name}</h3>
+                    <Link href={`/product/${product.id}`} className="block">
+                      <h3 className="font-bold text-gray-800 mb-2 text-sm line-clamp-2 hover:text-primary transition-colors">{product.name}</h3>
+                    </Link>
                     <p className="text-xs text-gray-600 mb-3 line-clamp-1">{product.description}</p>
                     {isOOS ? (
                       <p className="text-sm font-semibold text-red-500">Out of Stock</p>
                     ) : (
-                      <div className="flex items-center justify-center space-x-2">
-                        <span className="text-lg font-bold text-gray-800">₹{product.price}</span>
+                      <>
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className="text-lg font-bold text-gray-800">₹{product.price}</span>
+                          {product.original_price && (
+                            <span className="text-xs text-gray-400 line-through">₹{product.original_price}</span>
+                          )}
+                        </div>
                         {product.original_price && (
-                          <span className="text-xs text-gray-400 line-through">₹{product.original_price}</span>
+                          <p className="text-xs font-semibold text-green-600 mt-1">You&apos;ll Save ₹{(Number(product.original_price) - Number(product.price)).toFixed(0)}</p>
                         )}
-                      </div>
+                      </>
                     )}
                   </div>
                 </div>

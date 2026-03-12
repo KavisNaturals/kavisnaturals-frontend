@@ -73,8 +73,8 @@ const BestSellers = () => {
                   </div>
                 )}
                 {!isOOS && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/10">
-                    <div className="flex space-x-4">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/10 pointer-events-none">
+                    <div className="flex space-x-4 pointer-events-auto">
                       <button
                         onClick={() => {
                           if (hasVariants) { window.location.href = `/product/${product.id}` }
@@ -105,7 +105,9 @@ const BestSellers = () => {
                   {renderStars(product.rating)}
                   <span className="text-sm text-gray-600">({product.reviews_count}) Reviews</span>
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-3 text-lg">{product.name}</h3>
+                <Link href={`/product/${product.id}`} className="block">
+                  <h3 className="font-bold text-gray-800 mb-3 text-lg hover:text-primary transition-colors">{product.name}</h3>
+                </Link>
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
                 {isOOS ? (
                   <p className="text-sm font-semibold text-red-500 mb-2">Out of Stock</p>
@@ -118,7 +120,7 @@ const BestSellers = () => {
                       )}
                     </div>
                     {product.original_price && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs font-semibold text-primary">
                         You&apos;ll Save &#8377;{(Number(product.original_price) - Number(product.price)).toFixed(0)}
                       </p>
                     )}
