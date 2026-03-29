@@ -9,7 +9,7 @@ import Footer from '@/components/Footer'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
 import { paymentApi, ordersApi, usersApi, settingsApi, type Address } from '@/lib/api'
-import { ShoppingBag, ChevronDown, CreditCard, Truck } from 'lucide-react'
+import { ShoppingBag, ChevronDown, CreditCard } from 'lucide-react'
 
 declare global {
   interface Window { Razorpay: any }
@@ -37,7 +37,7 @@ export default function CheckoutPage() {
   const [loadingAddresses, setLoadingAddresses] = useState(false)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay'>('cod')
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay'>('razorpay')
   const [shippingCost, setShippingCost] = useState(60)
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(600)
 
@@ -102,23 +102,6 @@ export default function CheckoutPage() {
     setError('')
     if (items.length === 0) { setError('Your cart is empty.'); return }
     setPaying(true)
-
-    // ── Cash on Delivery ────────────────────────────────────────────────────
-    if (paymentMethod === 'cod') {
-      try {
-        const order = await ordersApi.create({
-          items: items.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price, variant_label: i.variant_label })),
-          total_amount: grandTotal,
-          shipping_address: shippingAddress,
-        } as any)
-        clearCart()
-        router.push(`/order-success?id=${order.id}`)
-      } catch (err: any) {
-        setError(err?.message || 'Could not place order. Please try again.')
-        setPaying(false)
-      }
-      return
-    }
 
     // ── Razorpay Online Payment ──────────────────────────────────────────────
     const loaded = await loadRazorpayScript()
@@ -320,20 +303,6 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
                 <div className="space-y-3">
-                  {/* COD */}
-                  <label className={`flex items-center space-x-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
-                    paymentMethod === 'cod' ? 'border-primary bg-primary/10' : 'border-gray-200 hover:border-gray-300'
-                  }`}>
-                    <input type="radio" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'}
-                      onChange={() => setPaymentMethod('cod')} className="accent-green-600 w-4 h-4" />
-                    <Truck size={22} className="text-gray-700 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold text-gray-900 text-sm">Cash on Delivery (COD)</p>
-                      <p className="text-xs text-gray-500">Pay when your order arrives</p>
-                    </div>
-                  </label>
-
-                  {/* Razorpay */}
                   <label className={`flex items-center space-x-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
                     paymentMethod === 'razorpay' ? 'border-primary bg-primary/10' : 'border-gray-200 hover:border-gray-300'
                   }`}>
@@ -409,15 +378,13 @@ export default function CheckoutPage() {
                       </svg>
                       <span>Placing Order...</span>
                     </span>
-                  ) : paymentMethod === 'cod' ? (
-                    `Place Order ₹${grandTotal.toFixed(0)} (COD)`
                   ) : (
                     `Pay ₹${grandTotal.toFixed(0)} with Razorpay`
                   )}
                 </button>
 
                 <p className="text-xs text-gray-400 text-center mt-3">
-                  {paymentMethod === 'cod' ? '🚚 Pay cash when your order is delivered' : '🔒 Payments secured by Razorpay'}
+                  🔒 Payments secured by Razorpay
                 </p>
               </div>
             </div>
