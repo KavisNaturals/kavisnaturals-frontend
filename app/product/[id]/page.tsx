@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, ZoomIn, X } from "lucide-react";
+import { Star, ZoomIn, X, ShoppingCart, Heart, Eye } from "lucide-react";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -417,17 +417,105 @@ export default function ProductDetailPage() {
         <section className="py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Related Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedProducts.map(p => (
-                <Link key={p.id} href={`/product/${p.id}`} className="text-center group">
-                  <div className="bg-gray-50 rounded-xl p-6 mb-3 aspect-square flex items-center justify-center overflow-hidden group-hover:shadow-md transition-shadow">
-                    <Image src={getImage(p)} alt={p.name} width={300} height={300} className="object-contain" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {relatedProducts.map((p) => {
+                const hasVariants = Array.isArray((p as any).options) && (p as any).options.length > 0;
+                const allVariantsOOS = hasVariants && (p as any).options.every((v: any) => Number(v.stock ?? -1) === 0);
+                const isOOS = hasVariants ? allVariantsOOS : Number(p.stock ?? 0) <= 0;
+                const actionAddToCart = () => {
+                  if (hasVariants) {
+                    window.location.href = `/product/${p.id}`;
+                  } else {
+                    addItem({
+                      id: p.id,
+                      name: p.name,
+                      price: Number((p as any).sale_price || p.price || 0),
+                      imageUrl: getImage(p),
+                      maxStock: Number(p.stock ?? 0),
+                    });
+                  }
+                };
+
+                return (
+                  <div key={p.id} className="bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group relative">
+                    <div className="relative aspect-square overflow-hidden">
+                      <Link href={`/product/${p.id}`} className="block w-full h-full">
+                        <Image
+                          src={getImage(p)}
+                          alt={p.name}
+                          fill
+                          className={`object-contain ${isOOS ? 'opacity-50' : ''}`}
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      </Link>
+                      {isOOS && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">OUT OF STOCK</span>
+                        </div>
+                      )}
+                      {!isOOS && (
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/10 pointer-events-none">
+                          <div className="flex space-x-3 pointer-events-auto">
+                            <button
+                              type="button"
+                              onClick={actionAddToCart}
+                              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-primary hover:text-white transition-colors"
+                              title={hasVariants ? 'Select variant' : 'Add to Cart'}
+                            >
+                              <ShoppingCart size={18} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleWishlist(p.id)}
+                              className={`w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-primary hover:text-white transition-colors ${isInWishlist(p.id) ? 'text-red-500' : ''}`}
+                              title="Wishlist"
+                            >
+                              <Heart size={18} />
+                            </button>
+                            <Link
+                              href={`/product/${p.id}`}
+                              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-primary hover:text-white transition-colors"
+                              title="View Product"
+                            >
+                              <Eye size={18} />
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-6 text-center">
+                      <div className="flex items-center justify-center space-x-2 mb-3">
+                        {renderStars(Number((p as any).rating || 0))}
+                        <span className="text-sm text-gray-600">({Number((p as any).reviews_count || 0).toLocaleString()})</span>
+                      </div>
+                      <Link href={`/product/${p.id}`} className="block">
+                        <h3 className="font-bold text-gray-800 mb-3 text-lg hover:text-primary transition-colors line-clamp-2">{p.name}</h3>
+                      </Link>
+                      {((p as any).short_description || (p as any).description) && (
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{(p as any).short_description || (p as any).description}</p>
+                      )}
+                      {isOOS ? (
+                        <p className="text-sm font-semibold text-red-500 mb-2">Out of Stock</p>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-center space-x-2 mb-2">
+                            <span className="text-xl font-bold text-gray-800">₹{Number((p as any).sale_price || p.price || 0).toFixed(0)}</span>
+                            {(p as any).original_price && (
+                              <span className="text-sm text-gray-400 line-through">₹{Number((p as any).original_price).toFixed(0)}</span>
+                            )}
+                          </div>
+                          {(p as any).original_price && (
+                            <p className="text-xs font-semibold text-primary">
+                              You&apos;ll Save ₹{(Number((p as any).original_price) - Number((p as any).sale_price || p.price || 0)).toFixed(0)}
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm font-medium text-gray-800 mb-1">{p.name}</p>
-                  {(p as any).short_description && <p className="text-xs text-gray-600">{(p as any).short_description}</p>}
-                  <p className="text-base font-bold text-gray-800 mt-2">₹{Number((p as any).sale_price || p.price || 0).toFixed(0)}</p>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
