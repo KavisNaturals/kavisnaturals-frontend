@@ -8,7 +8,7 @@ import AuthModal from './AuthModal'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
-import { productsApi, categoriesApi, type Product, API_BASE_URL, normalizeUrl } from '@/lib/api'
+import { productsApi, categoriesApi, settingsApi, type Product, API_BASE_URL, normalizeUrl } from '@/lib/api'
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -21,6 +21,7 @@ const Header = () => {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
   const [categories, setCategories] = useState<string[]>([])
+  const [freeShippingMin, setFreeShippingMin] = useState<number>(600)
   const router = useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const userDropdownRef = useRef<HTMLDivElement>(null)
@@ -30,6 +31,13 @@ const Header = () => {
   const { isLoggedIn, logout } = useAuth()
   const { count: cartCount, items: cartItems, total: cartTotal, removeItem, updateQty } = useCart()
   const { count: wishlistCount } = useWishlist()
+
+  // Load free shipping threshold
+  useEffect(() => {
+    settingsApi.getShipping()
+      .then(res => { if (res?.value?.free_threshold) setFreeShippingMin(res.value.free_threshold) })
+      .catch(() => {})
+  }, [])
 
   // Load categories from API
   useEffect(() => {
@@ -128,13 +136,13 @@ const Header = () => {
       {/* Top Green Strip - Marquee */}
       <div className="bg-primary text-black text-base py-4 overflow-hidden font-roboto font-medium leading-none tracking-normal">
         <div className="flex animate-marquee whitespace-nowrap">
-          <span className="mx-8">★ Free Shipping above Rs. 600 Order ★</span>
+          <span className="mx-8">★ Free Shipping above Rs. {freeShippingMin} Order ★</span>
           <span className="mx-8">★ We Deliver across all Over India ★</span>
-          <span className="mx-8">★ Free Shipping above Rs. 600 Order ★</span>
+          <span className="mx-8">★ Free Shipping above Rs. {freeShippingMin} Order ★</span>
           <span className="mx-8">★ We Deliver across all Over India ★</span>
-          <span className="mx-8">★ Free Shipping above Rs. 600 Order ★</span>
+          <span className="mx-8">★ Free Shipping above Rs. {freeShippingMin} Order ★</span>
           <span className="mx-8">★ We Deliver across all Over India ★</span>
-          <span className="mx-8">★ Free Shipping above Rs. 600 Order ★</span>
+          <span className="mx-8">★ Free Shipping above Rs. {freeShippingMin} Order ★</span>
           <span className="mx-8">★ We Deliver across all Over India ★</span>
         </div>
       </div>

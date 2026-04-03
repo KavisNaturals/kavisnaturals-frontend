@@ -56,6 +56,7 @@ const ProductDetailsPage = () => {
     name: '', tagline: '', description: '', product_description: '', category: '', size: '',
     stock: '', price: '', original_price: '', benefits: '', ingredients: '', direction: '', is_featured: false,
     meta_title: '', meta_description: '', meta_keywords: '',
+    rating: '', reviews_count: '',
   })
   const [imageUrl, setImageUrl] = useState('')
   const [imageUrls, setImageUrls] = useState<string[]>([])
@@ -92,6 +93,8 @@ const ProductDetailsPage = () => {
           ingredients: Array.isArray(p.ingredients) ? p.ingredients.join('\n') : '',
           direction: p.direction || '',
           is_featured: !!p.is_featured,
+          rating: String(p.rating ?? p.average_rating ?? ''),
+          reviews_count: String(p.reviews_count ?? ''),
           meta_title: p.meta_title || '',
           meta_description: p.meta_description || '',
           meta_keywords: p.meta_keywords || '',
@@ -170,6 +173,8 @@ const ProductDetailsPage = () => {
         price: Number(productData.price || 0),
         original_price: productData.original_price ? Number(productData.original_price) : undefined,
         stock: Number(productData.stock || 0),
+        rating: productData.rating !== '' ? Number(productData.rating) : undefined,
+        reviews_count: productData.reviews_count !== '' ? Number(productData.reviews_count) : undefined,
         benefits: productData.benefits ? productData.benefits.split('\n').map(x => x.trim()).filter(Boolean) : [],
         ingredients: productData.ingredients ? productData.ingredients.split('\n').map(x => x.trim()).filter(Boolean) : [],
         imageUrl,
@@ -247,6 +252,17 @@ const ProductDetailsPage = () => {
               <textarea rows={3} value={productData.benefits} onChange={e => setProductData({ ...productData, benefits: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white resize-none" />
               <textarea rows={3} value={productData.ingredients} onChange={e => setProductData({ ...productData, ingredients: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white resize-none" />
               <textarea rows={3} value={productData.direction} onChange={e => setProductData({ ...productData, direction: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white resize-none" />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Rating (0–5)</label>
+                  <input type="number" min="0" max="5" step="0.1" value={productData.rating} onChange={e => setProductData({ ...productData, rating: e.target.value })} placeholder="e.g. 4.5" className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Reviews Count</label>
+                  <input type="number" min="0" value={productData.reviews_count} onChange={e => setProductData({ ...productData, reviews_count: e.target.value })} placeholder="e.g. 128" className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white" />
+                </div>
+              </div>
 
               <label className="inline-flex items-center space-x-2 text-sm text-gray-700">
                 <input type="checkbox" checked={productData.is_featured} onChange={e => setProductData({ ...productData, is_featured: e.target.checked })} />

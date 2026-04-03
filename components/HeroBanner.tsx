@@ -5,11 +5,6 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import { bannersApi, Banner, API_BASE_URL, normalizeUrl } from '@/lib/api'
 
-// Import Swiper styles
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-
 const FALLBACK_BANNERS = [1, 2, 3].map((id) => ({
   id: String(id),
   image_path: '/images/banner.png',

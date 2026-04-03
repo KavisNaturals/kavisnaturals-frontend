@@ -4,8 +4,6 @@ import React from 'react'
 import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination, Autoplay } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
 
 const promises = [
   {
@@ -71,34 +69,26 @@ const OurPromise = () => {
           </p>
         </div>
 
-        {/* Mobile: Swiper carousel (1 slide per view) */}
-        <div className="md:hidden">
-          <Swiper
-            modules={[Pagination, Autoplay]}
-            slidesPerView={1}
-            pagination={{ clickable: true }}
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
-            className="pb-10"
-          >
-            {promises.map((p) => (
-              <SwiperSlide key={p.id} className="flex justify-center">
-                <PromiseCard imagePath={p.imagePath} title={p.title} description={p.description} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-
-        {/* Desktop: 5-column grid */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-5 gap-10 items-start">
-          {promises.map((p, idx) => (
-            <div
-              key={p.id}
-              className={idx === 4 ? 'md:col-span-2 flex justify-center lg:col-span-1 lg:block' : ''}
-            >
+        {/* Responsive Swiper */}
+        <Swiper
+          modules={[Pagination, Autoplay]}
+          slidesPerView={1}
+          spaceBetween={16}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop={true}
+          breakpoints={{
+            640: { slidesPerView: 2, spaceBetween: 20 },
+            1024: { slidesPerView: 5, spaceBetween: 24 },
+          }}
+          className="pb-10"
+        >
+          {promises.map((p) => (
+            <SwiperSlide key={p.id} className="flex justify-center">
               <PromiseCard imagePath={p.imagePath} title={p.title} description={p.description} />
-            </div>
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </div>
     </section>
   )

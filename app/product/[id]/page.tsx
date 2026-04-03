@@ -372,10 +372,10 @@ export default function ProductDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="space-y-6">
               {[
-                { key: 'description' as const, label: 'Description', content: <p className="text-gray-700 leading-relaxed text-sm">{product.description}</p> },
+                { key: 'description' as const, label: 'Description', content: <p className="text-gray-700 leading-relaxed text-sm">{(product as any).product_description || product.description}</p> },
                 { key: 'benefits' as const, label: 'Benefits', content: product.benefits ? <ul className="space-y-2">{(Array.isArray(product.benefits) ? product.benefits : String(product.benefits).split('\n')).map((b: string, i: number) => <li key={i} className="flex items-start space-x-3"><span className="text-primary text-lg">✓</span><span className="text-gray-700 text-sm">{b}</span></li>)}</ul> : null },
                 { key: 'ingredients' as const, label: 'Ingredients', content: product.ingredients ? <ul className="grid grid-cols-2 gap-3">{(Array.isArray(product.ingredients) ? product.ingredients : String(product.ingredients).split(',').map((s: string) => s.trim())).map((ing: string, i: number) => <li key={i} className="text-gray-700 text-sm">• {ing}</li>)}</ul> : null },
-                { key: 'direction' as const, label: 'Direction To Use', content: product.direction ? <p className="text-gray-700 leading-relaxed text-sm">{product.direction}</p> : null },
+                { key: 'direction' as const, label: 'Direction To Use', content: product.direction ? <ol className="space-y-2 list-none">{(Array.isArray(product.direction) ? product.direction : String(product.direction).split('\n').map((s: string) => s.trim()).filter(Boolean)).map((step: string, i: number) => <li key={i} className="flex items-start space-x-3"><span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-black text-xs font-bold flex items-center justify-center">{i + 1}</span><span className="text-gray-700 text-sm pt-0.5">{step}</span></li>)}</ol> : null },
               ].filter(s => s.content).map(({ key, label, content }) => (
                 <div key={key}>
                   <div className="flex items-center justify-between mb-4 pb-3 border-b-4 border-primary">
