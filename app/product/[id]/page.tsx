@@ -76,15 +76,42 @@ export default function ProductDetailPage() {
   const toggleSection = (section: keyof typeof expandedSections) =>
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
 
-  const handleAddToCart = () => {
-    if (!product) return;
-    if (hasVariants && !selectedVariant) return; // require variant selection
+  const buildCheckoutItem = () => {
+    if (!product) return null;
+    if (hasVariants && !selectedVariant) return null;
+
     const cartPrice = selectedVariant ? selectedVariant.price : Number((product as any).sale_price || product.price || 0);
     const cartName = selectedVariant ? `${product.name} (${selectedVariant.label})` : product.name;
     const cartMaxStock = hasVariants && selectedVariant
       ? Number(productVariants.find(v => v.label === selectedVariant.label)?.stock ?? 0)
       : Number(product.stock ?? 0);
-    addItem({ id: product.id, name: cartName, price: cartPrice, imageUrl: getImage(product), quantity, variant_label: selectedVariant?.label, maxStock: cartMaxStock });
+
+    return {
+      id: product.id,
+      name: cartName,
+      price: cartPrice,
+      imageUrl: getImage(product),
+      quantity,
+      variant_label: selectedVariant?.label,
+      maxStock: cartMaxStock,
+    };
+  };
+
+  const handleAddToCart = () => {
+    const item = buildCheckoutItem();
+    if (!item) return;
+    addItem(item);
+  };
+
+  const handleCheckoutNow = () => {
+    const item = buildCheckoutItem();
+    if (!item) return;
+
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('kn_direct_checkout', JSON.stringify([item]));
+    }
+
+    router.push('/checkout?direct=1');
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -298,7 +325,7 @@ export default function ProductDetailPage() {
                   </div>
                   <button
                     disabled={hasVariants && !selectedVariant}
-                    onClick={() => { if (!(hasVariants && !selectedVariant)) { handleAddToCart(); router.push('/checkout'); } }}
+                    onClick={handleCheckoutNow}
                     className="w-full mb-3 bg-primary text-black font-bold py-4 rounded-xl hover:bg-primary/80 transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Checkout Now

@@ -15,6 +15,15 @@ declare global {
   interface Window { Razorpay: any }
 }
 
+interface CheckoutItem {
+  id: string
+  name: string
+  price: number
+  imageUrl?: string
+  quantity: number
+  variant_label?: string
+}
+
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
     if (typeof window !== 'undefined' && window.Razorpay) { resolve(true); return }
@@ -30,10 +39,12 @@ const STATES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisga
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, total, clearCart } = useCart()
+  const { items, clearCart } = useCart()
   const { isLoggedIn } = useAuth()
 
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
+  const [directItems, setDirectItems] = useState<CheckoutItem[]>([])
+  const [isDirectCheckout, setIsDirectCheckout] = useState(false)
   const [loadingAddresses, setLoadingAddresses] = useState(false)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
@@ -70,6 +81,29 @@ export default function CheckoutPage() {
     }
   }, [isLoggedIn])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const directMode = new URLSearchParams(window.location.search).get('direct') === '1'
+    setIsDirectCheckout(directMode)
+
+    if (!directMode) {
+      setDirectItems([])
+      return
+    }
+
+    try {
+      const raw = sessionStorage.getItem('kn_direct_checkout')
+      const parsed = raw ? JSON.parse(raw) : []
+      setDirectItems(Array.isArray(parsed) ? parsed : [])
+    } catch {
+      setDirectItems([])
+    }
+  }, [])
+
+  const checkoutItems = isDirectCheckout && directItems.length > 0 ? directItems : items
+  const checkoutTotal = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
   const fillFromAddress = (addr: Address) => {
     setForm({
       name: `${addr.first_name} ${addr.last_name}`.trim(),
@@ -83,8 +117,8 @@ export default function CheckoutPage() {
     })
   }
 
-  const shipping = total >= freeShippingThreshold ? 0 : shippingCost
-  const grandTotal = total + shipping
+  const shipping = checkoutTotal >= freeShippingThreshold ? 0 : shippingCost
+  const grandTotal = checkoutTotal + shipping
 
   const shippingAddress = {
     name: form.name,
@@ -100,7 +134,7 @@ export default function CheckoutPage() {
   const handlePay = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (items.length === 0) { setError('Your cart is empty.'); return }
+    if (checkoutItems.length === 0) { setError('Your checkout is empty.'); return }
     setPaying(true)
 
     // ── Razorpay Online Payment ──────────────────────────────────────────────
@@ -117,7 +151,7 @@ export default function CheckoutPage() {
         amount: rzpOrder.amount,
         currency: rzpOrder.currency || 'INR',
         name: "KaVi's Naturals",
-        description: `Order of ${items.length} item(s)`,
+        description: `Order of ${checkoutItems.reduce((sum, item) => sum + item.quantity, 0)} item(s)`,
         image: '/images/logo.png',
         order_id: rzpOrder.id,
         handler: async (response: any) => {
@@ -137,14 +171,18 @@ export default function CheckoutPage() {
 
             // Step 4: Create order in our DB
             const order = await ordersApi.create({
-              items: items.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price, variant_label: i.variant_label })),
+              items: checkoutItems.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price, variant_label: i.variant_label })),
               total_amount: grandTotal,
               shipping_address: shippingAddress,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
             } as any)
 
-            clearCart()
+            if (isDirectCheckout && typeof window !== 'undefined') {
+              sessionStorage.removeItem('kn_direct_checkout')
+            } else {
+              clearCart()
+            }
             router.push(`/order-success?id=${order.id}`)
           } catch (err: any) {
             setError(err?.message || 'Order could not be saved after payment. Contact support with payment ID: ' + response.razorpay_payment_id)
@@ -169,7 +207,7 @@ export default function CheckoutPage() {
     }
   }
 
-  if (items.length === 0 && !paying) {
+  if (checkoutItems.length === 0 && !paying) {
     return (
       <main className="min-h-screen bg-white">
         <Header />
@@ -324,7 +362,7 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-bold text-gray-900 mb-4">Order Summary</h2>
 
                 <div className="space-y-3 mb-4 max-h-80 overflow-y-auto">
-                  {items.map(item => (
+                  {checkoutItems.map(item => (
                     <div key={item.id} className="flex items-start space-x-3">
                       <div className="w-14 h-14 bg-gray-50 rounded-lg relative flex-shrink-0 border border-gray-200 overflow-hidden">
                         {item.imageUrl ? (
@@ -348,7 +386,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{total.toFixed(0)}</span>
+                    <span>₹{checkoutTotal.toFixed(0)}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
@@ -357,7 +395,7 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                   {shipping > 0 && (
-                    <p className="text-xs text-gray-400">Add ₹{(freeShippingThreshold - total).toFixed(0)} more for free shipping</p>
+                    <p className="text-xs text-gray-400">Add ₹{(freeShippingThreshold - checkoutTotal).toFixed(0)} more for free shipping</p>
                   )}
                   <div className="flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-gray-100">
                     <span>Total</span>
